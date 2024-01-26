@@ -14,10 +14,27 @@ OPEN viewCursor;
 FETCH NEXT FROM viewCursor INTO @viewName;
 WHILE @@FETCH_STATUS = 0
 BEGIN
+    -- In ra giá trị của biến @viewName
+    -- PRINT '@viewName: ' + @viewName;
+
     DECLARE @sql NVARCHAR(MAX);
-    SET @sql = N'INSERT INTO #ViewRecordCount (ViewName, RecordCount) ' +
-               N'SELECT N''' + @viewName + ''', COUNT(*) FROM ' + @viewName;
-    
+
+    -- Nếu viewName không có đóng mở ngoặc vuông ở đầu và cuối mà trong tên lại có dấu gạch ngang thì khi truy vấn đến view này sẽ bị lỗi
+    IF ((CHARINDEX('[', @viewName) = 0 OR CHARINDEX(']', @viewName) = 0) AND CHARINDEX('-', @viewName) != 0)
+
+    BEGIN
+        SET @sql = N'INSERT INTO #ViewRecordCount (ViewName, RecordCount) ' + N'SELECT N''' + @viewName + ''', COUNT(*) FROM [' + @viewName + ']';
+    END
+
+    ELSE
+
+    BEGIN
+        SET @sql = N'INSERT INTO #ViewRecordCount (ViewName, RecordCount) ' + N'SELECT N''' + @viewName + ''', COUNT(*) FROM ' + @viewName;
+    END
+
+    -- In ra câu truy vấn động
+    -- PRINT 'sql: ' + @sql;
+
     EXEC sp_executesql @sql;
 
     FETCH NEXT FROM viewCursor INTO @viewName;
