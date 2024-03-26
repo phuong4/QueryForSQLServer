@@ -1,5 +1,5 @@
 -- https://stackoverflow.com/questions/13174627/how-to-search-a-string-in-databases-of-sql-server/22854200#22854200
-DECLARE @SearchStr nvarchar(100) 
+DECLARE @SearchStr nvarchar(100)
     SET @SearchStr = 'StringToFind'
 
 DECLARE @Results TABLE(ColumnName nvarchar(370), ColumnValue nvarchar(3630))
@@ -16,8 +16,8 @@ BEGIN
     SET @TableName = 
     (
         SELECT MIN(QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME))
-        FROM    INFORMATION_SCHEMA.TABLES
-        WHERE       TABLE_TYPE = 'BASE TABLE'
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_TYPE = 'BASE TABLE'
             AND QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) > @TableName
             AND OBJECTPROPERTY(
                     OBJECT_ID(
@@ -31,9 +31,9 @@ BEGIN
         SET @ColumnName =
         (
             SELECT MIN(QUOTENAME(COLUMN_NAME))
-            FROM    INFORMATION_SCHEMA.COLUMNS
-            WHERE       TABLE_SCHEMA    = PARSENAME(@TableName, 2)
-                AND TABLE_NAME  = PARSENAME(@TableName, 1)
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = PARSENAME(@TableName, 2)
+                AND TABLE_NAME = PARSENAME(@TableName, 1)
                 AND DATA_TYPE IN ('char', 'varchar', 'nchar', 'nvarchar')
                 AND QUOTENAME(COLUMN_NAME) > @ColumnName
         )
